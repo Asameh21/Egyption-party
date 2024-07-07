@@ -3,10 +3,6 @@
 const asideWidth = $("aside").outerWidth();
 const counterOffset = $("#counter").offset().top;
 const time = new Date().getDay();
-let seconds = localStorage.getItem("seconds");
-let minutes = localStorage.getItem("minutes");
-let hours = localStorage.getItem("hours");
-let days = localStorage.getItem("days");
 $(".open").on("click", function () {
   $("aside").css("transform", "translateX(0)");
   $(".open").css("transform", `translateX(${asideWidth}px)`);
@@ -35,31 +31,44 @@ $(`aside a[href ^="#"]`).on("click", function () {
   const sectionOffset = $(eleId).offset().top;
   $("html, body").animate({ scrollTop: sectionOffset }, 3000);
 });
-function counter() {
+let seconds = parseInt(localStorage.getItem("seconds")) || 0;
+let minutes = parseInt(localStorage.getItem("minutes")) || 0;
+let hours = parseInt(localStorage.getItem("hours")) || 0;
+let days = parseInt(localStorage.getItem("days")) || 0;
+
+function updateDisplay() {
   $(".seconds .time span").html(seconds);
   $(".minutes .time span").html(minutes);
   $(".hours .time span").html(hours);
   $(".days .time span").html(days);
+}
+
+function counter() {
+  updateDisplay();
+
   seconds--;
-  localStorage.setItem("seconds", seconds);
   if (seconds < 0) {
-    seconds = 60;
+    seconds = 59;
     minutes++;
-    localStorage.setItem("minutes", minutes);
   }
-  if (minutes > 60) {
+  if (minutes > 59) {
     minutes = 0;
     hours++;
-    localStorage.setItem("hours", hours);
   }
-  if (hours > 24) {
+  if (hours > 23) {
     hours = 0;
     days++;
-    localStorage.setItem("days", days);
   }
-}
-setInterval(counter, 1000);
 
+  localStorage.setItem("seconds", seconds);
+  localStorage.setItem("minutes", minutes);
+  localStorage.setItem("hours", hours);
+  localStorage.setItem("days", days);
+
+  updateDisplay();
+}
+
+setInterval(counter, 1000);
 
 $("textarea").on("input", function () {
   let remaining = 100 - $(this).val().length;
